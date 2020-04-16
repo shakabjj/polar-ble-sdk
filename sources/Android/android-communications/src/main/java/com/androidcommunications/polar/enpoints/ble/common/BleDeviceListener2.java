@@ -30,13 +30,13 @@ public abstract class BleDeviceListener2 extends BleDeviceListener implements Sc
     private BleDeviceSessionStateChangedCallback changedCallback = null;
     protected BlePowerStateChangedCallback powerStateChangedCallback = null;
 
-    public BleDeviceListener2(Context context, Set<Class<? extends BleGattBase> > clients) {
+    public BleDeviceListener2(final Context context, Set<Class<? extends BleGattBase> > clients) {
         super(clients);
         this.context = context;
-        this.connectionHandler = new ConnectionHandler(this,this);
+        this.connectionHandler = new ConnectionHandler(context,this,this);
         this.connectionHandler.addObserver(new ConnectionHandlerObserver() {
             @Override
-            public void deviceSessionStateChanged(BleDeviceSession2 session) {
+            public void deviceSessionStateChanged(final BleDeviceSession2 session) {
                 if (changedCallback != null) {
                     if (session.getSessionState() == BleDeviceSession.DeviceSessionState.SESSION_OPEN_PARK &&
                             session.getPreviousState() == BleDeviceSession.DeviceSessionState.SESSION_OPEN) {
@@ -77,6 +77,9 @@ public abstract class BleDeviceListener2 extends BleDeviceListener implements Sc
     @Override
     public void setBlePowerStateCallback(@Nullable BlePowerStateChangedCallback cb) {
         this.powerStateChangedCallback = cb;
+        if (cb != null) {
+            cb.stateChanged(this.bleActive());
+        }
     }
 
     @Override
